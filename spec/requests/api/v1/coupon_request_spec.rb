@@ -3,11 +3,14 @@ require "rails_helper"
 describe 'Coupon endpoints', :type => :request do
     before(:each) do
         @merchants = create_list(:merchant, 5)
+        
         @coupon_1 = create(:coupon, merchant_id: @merchants[0].id)
         @coupon_2 = create(:coupon, merchant_id: @merchants[0].id)
         @coupon_3 = create(:coupon, merchant_id: @merchants[1].id)
         @coupon_4 = create(:coupon, merchant_id: @merchants[3].id)
         @coupon_5 = create(:coupon, merchant_id: @merchants[4].id)
+        @coupon_5 = create(:coupon, merchant_id: @merchants[4].id)
+
         @invoice_1 = create(:invoice, coupon_id: @coupon_1.id)
         @invoice_2 = create(:invoice, coupon_id: @coupon_1.id)
         @invoice_3 = create(:invoice, coupon_id: @coupon_1.id)
@@ -59,6 +62,48 @@ describe 'Coupon endpoints', :type => :request do
             expect(json[:data][:type]).to eq("coupon")
 
             expect(Coupon.last.name).to eq(name)
+        end
+    end
+
+    describe 'PATCH coupon/:id' do
+        it 'should update a coupon from inactive to active if query param update=active' do
+            coupon = create(:coupon, status: "inactive")
+            status_change = "active"
+            body = {
+                name: coupon.name,
+                code: coupon.code,
+                percent_off: coupon.percent_off,
+                dollar_off: coupon.dollar_off,
+                merchant_id: coupon.merchant_id,
+                status: status_change
+            }
+
+            patch "/api/v1/coupons/#{coupon.id}?status=activate", params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:ok)
+            expect(json[:data][:attributes][:status]).to eq(status_change)
+            expect(Coupon.find(coupon.id).status).to eq(status_change)
+        end
+
+        it 'should update a coupon from active to inactive if query param update=inactive' do
+            coupon = create(:coupon, status: "active")
+            status_change = "inactive"
+            body = {
+                name: coupon.name,
+                code: coupon.code,
+                percent_off: coupon.percent_off,
+                dollar_off: coupon.dollar_off,
+                merchant_id: coupon.merchant_id,
+                status: status_change
+            }
+
+            patch "/api/v1/coupons/#{coupon.id}?status=deactivate", params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:ok)
+            expect(json[:data][:attributes][:status]).to eq(status_change)
+            expect(Coupon.find(coupon.id).status).to eq(status_change)
         end
     end
 end

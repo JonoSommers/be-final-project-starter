@@ -12,4 +12,12 @@ class Coupon < ApplicationRecord
     def self.coupon_usage(coupon)
         Invoice.where(coupon_id: coupon.id).count
     end
+
+    def self.active_status_change(coupon)
+        coupon.update(status: "inactive")
+    end
+
+    def self.inactive_status_change(coupon)
+        coupon.update(status: "active")
+    end
 end

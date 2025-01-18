@@ -24,8 +24,9 @@ Rails.application.routes.draw do
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices"
+        resources :coupons, only: :index, controller: "merchants/coupons"
       end
-      resources :coupons, only: [:show, :create]
+      resources :coupons, only: [:show, :create, :update]
     end
   end
 end
