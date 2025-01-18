@@ -13,7 +13,7 @@ class Api::V1::CouponsController < ApplicationController
             coupon.save
             render json: CouponSerializer.new(coupon), status: :created
         else
-            render json: { message: 'Validation Failed', errors: coupon.errors.full_messages.to_sentence }, status: :unprocessable_entity
+            render json: { message: 'Creation Failed', errors: coupon.errors.full_messages.to_sentence }, status: :unprocessable_entity
         end
     end
 
@@ -32,7 +32,7 @@ class Api::V1::CouponsController < ApplicationController
 
     private
 
-  def coupon_params
-    params.permit(:name, :code, :percent_off, :dollar_off, :merchant_id, :status)
-  end
+    def coupon_params
+        params.permit(:name, :code, :percent_off, :dollar_off, :merchant_id, :status)
+    end
 end
