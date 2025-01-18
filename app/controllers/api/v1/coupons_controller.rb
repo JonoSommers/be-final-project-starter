@@ -17,6 +17,19 @@ class Api::V1::CouponsController < ApplicationController
         end
     end
 
+    def update
+        if params[:status] == "deactivate"
+            coupon = Coupon.find(params[:id])
+            Coupon.active_status_change(coupon)
+            render json: CouponSerializer.new(coupon), status: :ok
+
+        elsif params[:status] == "activate"
+            coupon = Coupon.find(params[:id])
+            Coupon.inactive_status_change(coupon)
+            render json: CouponSerializer.new(coupon), status: :ok
+        end
+    end
+
     private
 
   def coupon_params
