@@ -3,5 +3,6 @@ FactoryBot.define do
     status { "shipped" }
     customer
     merchant
+    coupon
   end
 end

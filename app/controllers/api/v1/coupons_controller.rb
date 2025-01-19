@@ -12,8 +12,6 @@ class Api::V1::CouponsController < ApplicationController
         if coupon.valid?
             coupon.save
             render json: CouponSerializer.new(coupon), status: :created
-        else
-            render json: { message: 'Creation Failed', errors: coupon.errors.full_messages.to_sentence }, status: :unprocessable_entity
         end
     end
 
@@ -30,7 +28,7 @@ class Api::V1::CouponsController < ApplicationController
                 render json: CouponSerializer.new(coupon), status: :ok
             end
         else
-            render json: { message: 'That is not a valid param. Please enter activate, or deactivate depending on your needs.'}
+            render_error
         end
     end
 

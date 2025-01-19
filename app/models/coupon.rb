@@ -4,8 +4,8 @@ class Coupon < ApplicationRecord
 
     validates :name, presence: true
     validates :code, presence: true, uniqueness: true
-    validates :percent_off, numericality: {greater_than_or_equal_to: 0}, allow_nil: true
-    validates :dollar_off, numericality: {greater_than_or_equal_to: 0}, allow_nil: true
+    validates :percent_off, numericality: {greater_than_or_equal_to: 0}, presence: true
+    validates :dollar_off, numericality: {greater_than_or_equal_to: 0}, presence: true
     validates :merchant_id, presence: true
     validates :status, inclusion: { in: ["active", "inactive"] }, presence: true
 

@@ -35,7 +35,7 @@ describe 'Coupon endpoints', :type => :request do
         it 'should successfully create a Coupon with an inactive status when all attributes are present' do
             name = Faker::Commerce.product_name + " Discount"
             code = Faker::Commerce.promotion_code
-            percent_off = nil
+            percent_off = 0
             dollar_off = Faker::Number.between(from: 5, to: 25).to_f.round(2)
             merchant_id = @merchants[2].id
             status = "active"
@@ -62,6 +62,29 @@ describe 'Coupon endpoints', :type => :request do
             expect(json[:data][:type]).to eq("coupon")
 
             expect(Coupon.last.name).to eq(name)
+        end
+
+        xit 'will not create a Coupon that is missing attributes' do
+            name = Faker::Commerce.product_name + " Discount"
+            code = Faker::Commerce.promotion_code
+            percent_off = 0
+            merchant_id = @merchants[2].id
+            status = "active"
+
+            body = {
+                name: name,
+                code: code,
+                percent_off: percent_off,
+                merchant_id: merchant_id,
+                status: status
+            }
+
+            post api_v1_coupons_path, params: body, as: :json
+
+            expect(response).to_not be_successful
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.message).to eq("Creation Failed")
+            expect(response.errors).to eq("Dollar off is not a number and Percent off can't be blank")
         end
     end
 
