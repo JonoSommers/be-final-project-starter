@@ -48,4 +48,5 @@ class Merchant < ApplicationRecord
   def self.get_all_merchants_coupons(merchant)
     merchant.coupons
   end
+
 end

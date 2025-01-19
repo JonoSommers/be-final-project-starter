@@ -28,4 +28,9 @@ class Coupon < ApplicationRecord
             self.status = "inactive"
         end
     end
+
+    def self.has_met_coupon_limit(coupon)
+        merchant = Merchant.find(coupon.merchant_id)
+        merchant.coupons.where(status: 'active').count > 5
+    end
 end

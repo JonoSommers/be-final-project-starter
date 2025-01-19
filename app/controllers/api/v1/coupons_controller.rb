@@ -18,15 +18,19 @@ class Api::V1::CouponsController < ApplicationController
     end
 
     def update
+        coupon = Coupon.find(params[:id])
         if params[:status] == "deactivate"
-            coupon = Coupon.find(params[:id])
             Coupon.active_status_change(coupon)
             render json: CouponSerializer.new(coupon), status: :ok
-
         elsif params[:status] == "activate"
-            coupon = Coupon.find(params[:id])
-            Coupon.inactive_status_change(coupon)
-            render json: CouponSerializer.new(coupon), status: :ok
+            if Coupon.has_met_coupon_limit(coupon) == true
+                render json: { message: 'This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.' }
+            else
+                Coupon.inactive_status_change(coupon)
+                render json: CouponSerializer.new(coupon), status: :ok
+            end
+        else
+            render json: { message: 'That is not a valid param. Please enter activate, or deactivate depending on your needs.'}
         end
     end
 
