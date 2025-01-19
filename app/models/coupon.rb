@@ -9,6 +9,8 @@ class Coupon < ApplicationRecord
     validates :merchant_id, presence: true
     validates :status, inclusion: { in: ["active", "inactive"] }, presence: true
 
+    after_initialize :default_inactive
+
     def self.coupon_usage(coupon)
         Invoice.where(coupon_id: coupon.id).count
     end
@@ -19,5 +21,16 @@ class Coupon < ApplicationRecord
 
     def self.inactive_status_change(coupon)
         coupon.update(status: "active")
+    end
+
+    def default_inactive
+        if new_record?
+            self.status = "inactive"
+        end
+    end
+
+    def self.has_met_coupon_limit(coupon)
+        merchant = Merchant.find(coupon.merchant_id)
+        merchant.coupons.where(status: 'active').count > 5
     end
 end

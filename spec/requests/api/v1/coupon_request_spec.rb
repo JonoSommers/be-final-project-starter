@@ -32,7 +32,7 @@ describe 'Coupon endpoints', :type => :request do
     end
 
     describe 'POST coupon' do
-        it 'should successfully create when all attributes are present' do
+        it 'should successfully create a Coupon with an inactive status when all attributes are present' do
             name = Faker::Commerce.product_name + " Discount"
             code = Faker::Commerce.promotion_code
             percent_off = nil
@@ -58,7 +58,7 @@ describe 'Coupon endpoints', :type => :request do
             expect(json[:data][:attributes][:percent_off]).to eq(percent_off)
             expect(json[:data][:attributes][:dollar_off]).to eq(dollar_off)
             expect(json[:data][:attributes][:merchant_id]).to eq(merchant_id)
-            expect(json[:data][:attributes][:status]).to eq(status)
+            expect(json[:data][:attributes][:status]).to eq("inactive")
             expect(json[:data][:type]).to eq("coupon")
 
             expect(Coupon.last.name).to eq(name)

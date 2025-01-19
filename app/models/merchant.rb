@@ -45,7 +45,8 @@ class Merchant < ApplicationRecord
     Merchant.find_all_by_name(name).order("LOWER(name)").first
   end
 
-  def self.coupon_count(merchant)
+  def self.get_all_merchants_coupons(merchant)
     merchant.coupons
   end
+
 end
