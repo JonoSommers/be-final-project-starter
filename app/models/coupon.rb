@@ -31,6 +31,6 @@ class Coupon < ApplicationRecord
 
     def self.has_met_coupon_limit(coupon)
         merchant = Merchant.find(coupon.merchant_id)
-        merchant.coupons.where(status: 'active').count > 5
+        merchant.coupons.where(status: 'active').count >= 5
     end
 end

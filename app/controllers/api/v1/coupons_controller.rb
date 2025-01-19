@@ -12,6 +12,8 @@ class Api::V1::CouponsController < ApplicationController
         if coupon.valid?
             coupon.save
             render json: CouponSerializer.new(coupon), status: :created
+        else
+            render json: { message: 'Creation Failed', errors: coupon.errors.full_messages.to_sentence }, status: :unprocessable_entity
         end
     end
 
@@ -21,8 +23,8 @@ class Api::V1::CouponsController < ApplicationController
             Coupon.active_status_change(coupon)
             render json: CouponSerializer.new(coupon), status: :ok
         elsif params[:status] == "activate"
-            if Coupon.has_met_coupon_limit(coupon) == true
-                render json: { message: 'This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.' }
+            if Coupon.has_met_coupon_limit(coupon)
+                render json: { message: 'This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.' }, status: :unprocessable_entity
             else
                 Coupon.inactive_status_change(coupon)
                 render json: CouponSerializer.new(coupon), status: :ok

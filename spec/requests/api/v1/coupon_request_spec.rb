@@ -9,7 +9,6 @@ describe 'Coupon endpoints', :type => :request do
         @coupon_3 = create(:coupon, merchant_id: @merchants[1].id)
         @coupon_4 = create(:coupon, merchant_id: @merchants[3].id)
         @coupon_5 = create(:coupon, merchant_id: @merchants[4].id)
-        @coupon_5 = create(:coupon, merchant_id: @merchants[4].id)
 
         @invoice_1 = create(:invoice, coupon_id: @coupon_1.id)
         @invoice_2 = create(:invoice, coupon_id: @coupon_1.id)
@@ -64,7 +63,7 @@ describe 'Coupon endpoints', :type => :request do
             expect(Coupon.last.name).to eq(name)
         end
 
-        xit 'will not create a Coupon that is missing attributes' do
+        it 'should not create a Coupon that is missing attributes' do
             name = Faker::Commerce.product_name + " Discount"
             code = Faker::Commerce.promotion_code
             percent_off = 0
@@ -80,11 +79,10 @@ describe 'Coupon endpoints', :type => :request do
             }
 
             post api_v1_coupons_path, params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
 
-            expect(response).to_not be_successful
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(response.message).to eq("Creation Failed")
-            expect(response.errors).to eq("Dollar off is not a number and Percent off can't be blank")
+            expect(json[:errors]).to eq("Dollar off is not a number and Dollar off can't be blank")
         end
     end
 
@@ -127,6 +125,18 @@ describe 'Coupon endpoints', :type => :request do
             expect(response).to have_http_status(:ok)
             expect(json[:data][:attributes][:status]).to eq(status_change)
             expect(Coupon.find(coupon.id).status).to eq(status_change)
+        end
+
+        it 'should not allow for a coupon to be switched to active if its Merchant already has 5 active coupons' do
+            create_list(:coupon, 5, merchant_id: @merchants[0].id, status: 'active')
+            coupon = create(:coupon, merchant_id: @merchants[0].id, status: 'inactive')
+            body = { status: 'activate' }
+
+            patch "/api/v1/coupons/#{coupon.id}?status=activate", params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(json[:message]).to eq("This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.")
         end
     end
 end
