@@ -48,4 +48,8 @@ class Merchant < ApplicationRecord
   def self.get_all_merchants_coupons(merchant)
     merchant.coupons
   end
+
+  def self.get_all_invoices_with_coupons(merchant)
+    merchant.invoices.where.not(coupon_id: nil)
+  end
 end
