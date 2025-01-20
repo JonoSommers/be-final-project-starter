@@ -75,6 +75,25 @@ describe "Merchant endpoints", :type => :request do
       expect(json[:data][1][:attributes][:item_count]).to eq(2)
       expect(json[:data][2][:attributes][:item_count]).to eq(7)
     end
+
+    it 'should return coupons_count and invoice_coupon_count attributes when no params are present' do
+      merchant = create(:merchant)
+
+      coupons = create_list(:coupon, 5, merchant_id: merchant.id, status: 'active')
+      invoices = create_list(:invoice, 4, merchant_id: merchant.id, coupon_id:coupons[0].id)
+      no_coupon_invoices = create_list(:invoice, 3, merchant_id: merchant.id, coupon_id: nil)
+
+      get api_v1_merchants_path
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to have_http_status(:ok)
+      expect(json[:data])
+      expect(json[:data]).to all(include(:id, :type, :attributes))
+      expect(json[:data][0][:attributes]).to have_key(:coupon_count)
+      expect(json[:data][0][:attributes][:coupon_count]).to eq(5)
+      expect(json[:data][0][:attributes]).to have_key(:invoice_coupon_count)
+      expect(json[:data][0][:attributes][:invoice_coupon_count]).to eq(4)
+    end
   end
 
   describe "get a merchant by id" do
