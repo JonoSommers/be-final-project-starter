@@ -1,5 +1,18 @@
 class Api::V1::CouponsController < ApplicationController
 
+    def index
+        options = {}
+        if params[:active] == 'true'
+            options[:meta] = {count: Coupon.active_coupons.count}
+            render json: CouponSerializer.new(Coupon.active_coupons, options), status: :ok
+        elsif params[:inactive] == 'true'
+            options[:meta] = {count: Coupon.inactive_coupons.count}
+            render json: CouponSerializer.new(Coupon.inactive_coupons, options), status: :ok
+        else
+            render_error
+        end
+    end
+
     def show
         options = {}
         coupon = Coupon.find(params[:id])
