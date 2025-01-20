@@ -21,8 +21,8 @@ describe Coupon, type: :model do
             invoice1 = create(:invoice, coupon_id: coupon.id)
             invoice2 = create(:invoice, coupon_id: coupon.id)
             invoice3 = create(:invoice, coupon_id: coupon.id)
-
-            meta_count = Invoice.where(coupon_id: coupon.id).count
+            
+            meta_count = Coupon.coupon_usage(coupon)
 
             expect(meta_count).to eq(3)
         end
