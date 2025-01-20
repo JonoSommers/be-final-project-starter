@@ -138,5 +138,14 @@ describe 'Coupon endpoints', :type => :request do
             expect(response).to have_http_status(:unprocessable_entity)
             expect(json[:message]).to eq("This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.")
         end
+
+        it 'should not allow for a user to input a param other than deactivate or activate' do
+            coupon = create(:coupon)
+            patch "/api/v1/coupons/#{coupon.id}?status=test", params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(json[:message]).to eq("your query could not be completed")
+            expect(json[:errors]).to eq(["invalid search params"])
+        end
     end
 end
