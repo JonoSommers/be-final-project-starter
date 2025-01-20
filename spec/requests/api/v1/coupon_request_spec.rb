@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe 'Coupon endpoints', :type => :request do
-    before(:each) do
+    before(:each) do 
         @merchants = create_list(:merchant, 5)
         
         @coupon_1 = create(:coupon, merchant_id: @merchants[0].id)
@@ -13,6 +13,68 @@ describe 'Coupon endpoints', :type => :request do
         @invoice_1 = create(:invoice, coupon_id: @coupon_1.id)
         @invoice_2 = create(:invoice, coupon_id: @coupon_1.id)
         @invoice_3 = create(:invoice, coupon_id: @coupon_1.id)
+    end
+
+    describe 'Index' do
+        it 'should return all coupons with an active status if the query param[:active] = true' do
+            create_list(:coupon, 5, status: 'active')
+            create_list(:coupon, 3, status: 'inactive')
+
+            get api_v1_coupons_path, params: { active: 'true' }
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:ok)
+            expect(json[:data]).to all(include(:id, :type, :attributes))
+            expect(json[:meta][:count]).to eq(5)
+        end
+
+        it 'should return an empty body if there are no active coupons' do
+            create_list(:coupon, 3, status: 'inactive')
+
+            get api_v1_coupons_path, params: { active: 'true' }
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:ok)
+            expect(json[:data]).to eq([])
+            expect(json[:meta][:count]).to eq(0)
+        end
+
+        it 'should return all coupons with an inactive status if the query param[:inactive] = true' do
+            create_list(:coupon, 5, status: 'active')
+            create_list(:coupon, 3, status: 'inactive')
+
+            get api_v1_coupons_path, params: { inactive: 'true' }
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:ok)
+            expect(json[:data]).to all(include(:id, :type, :attributes))
+            expect(json[:meta][:count]).to eq(8)
+        end
+
+        # xit 'should return an empty body if there are no inactive coupons', :skip_before do
+        #     create_list(:coupon, 5, status: 'active')
+
+        #     get api_v1_coupons_path, params: { active: 'true' }
+        #     json = JSON.parse(response.body, symbolize_names: true)
+
+        #     expect(response).to have_http_status(:ok)
+        #     expect(json[:data]).to eq([])
+        #     expect(json[:meta][:count]).to eq(0)
+        # end
+
+        it 'should throw in error if the query param is invalid' do
+            get api_v1_coupons_path, params: { test: 'true' }
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(json[:message]).to eq("your query could not be completed")
+            expect(json[:errors]).to eq(["invalid search params"])
+
+            get api_v1_coupons_path, params: { active: 'test' }
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(json[:message]).to eq("your query could not be completed")
+            expect(json[:errors]).to eq(["invalid search params"])
+        end
     end
 
     describe 'GET coupon by id' do
@@ -87,7 +149,7 @@ describe 'Coupon endpoints', :type => :request do
     end
 
     describe 'PATCH coupon/:id' do
-        it 'should update a coupon from inactive to active if query param update=active' do
+        it 'should update a coupon from inactive to active if search param update=active' do
             coupon = create(:coupon, status: "inactive")
             status_change = "active"
             body = {
@@ -107,7 +169,7 @@ describe 'Coupon endpoints', :type => :request do
             expect(Coupon.find(coupon.id).status).to eq(status_change)
         end
 
-        it 'should update a coupon from active to inactive if query param update=inactive' do
+        it 'should update a coupon from active to inactive if search param update=inactive' do
             coupon = create(:coupon, status: "active")
             status_change = "inactive"
             body = {
