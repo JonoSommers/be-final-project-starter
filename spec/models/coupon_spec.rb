@@ -71,5 +71,25 @@ describe Coupon, type: :model do
 
             expect(result).to be(false)
         end
+
+        it 'should return all coupons with an active status' do
+            active_coupons = create_list(:coupon, 5, status: 'active')
+            inactive_coupons = create_list(:coupon, 3)
+
+            response = Coupon.active_coupons
+
+            expect(response.count).to eq(5)
+            expect(response).to eq(active_coupons)
+        end
+
+        it 'should return all coupons with an inactive status' do
+            active_coupons = create_list(:coupon, 5, status: 'active')
+            inactive_coupons = create_list(:coupon, 3)
+
+            response = Coupon.inactive_coupons
+
+            expect(response.count).to eq(3)
+            expect(response).to eq(inactive_coupons)
+        end
     end
 end
