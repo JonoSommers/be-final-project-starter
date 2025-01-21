@@ -1,17 +1,45 @@
 # Little Shop | Final Project | Backend Starter Repo
 
-This repository is the completed API for use with the Mod 2 Group Project. The FE repo for Little Shop lives [here](https://github.com/turingschool-examples/little-shop-fe-vite).
+* Ruby/Rails version
+We are working with:
+    Ruby 3.2.2
+    Rails 7.1.5.1
 
-This repo can be used as the starter repo for the Mod 2 final project.
+* System dependencies
+In order for the project to function properly you will need:
+    Ruby 3.2.2
+    Rails 7.1.5.1
+    Bundler version 2.5.23
+    PostgreSQL
+    Gems:
+        SimpleCov (for code coverage reporting)
+        Rspec-Rails (for testing)
+        Pry (for debugging)
+        Debug (advanced debugging tool)
 
-## Setup
+* Configuration
+Run these terminal commands in this order:
+    bundle install
+    bundle update
+    bundle exec rspec
+    rails server
 
-```ruby
-bundle install
-rails db:{drop,create,migrate,seed}
-rails db:schema:dump
-```
+* Database creation
+Run this command in the terminal:
+    rails db:{drop,create,migrate,seed}
 
-This repo uses a pgdump file to seed the database. Your `db:seed` command will produce lots of output, and that's normal. If all your tests fail after running `db:seed`, you probably forgot to run `rails db:schema:dump`. 
+* Database initialization
+PostgreSQL
+rails db:{create,migrate,seed}
+To verify the database is working properly, you can run:
+    bundle exec rspec
+        If the tests all pass, then you know the database is working properly.
 
-Run your server with `rails s` and you should be able to access endpoints via localhost:3000.
+* How to run the test suite
+To run the test suite:  
+    Input 'bundle exec rspec' into the terminal.
+
+To run the tests in postman:
+    Run 'rails s' in the terminal.
+    Navigate to postman, look through the drop downs and select the endpoint you want to run.
+    Click send, then click 'Body', and select Test Results.
