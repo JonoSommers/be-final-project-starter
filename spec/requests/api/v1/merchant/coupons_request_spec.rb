@@ -29,5 +29,7 @@ describe 'Merchant Coupons endpoint', :type => :request do
             expect(coupon_1_data[:merchant_id]).to eq(@merchants[0].id)
             expect(coupon_1_data[:status]).to eq(@coupon_1.status)
         end
+
+        it 'should rai'
     end
 end

@@ -11,4 +11,8 @@ class ApplicationController < ActionController::API
     render json: ErrorSerializer.format_invalid_search_response,
         status: :bad_request
   end
+
+  def creation_error(coupon)
+    render json: { message: 'Creation Failed', errors: coupon.errors.full_messages.to_sentence }, status: :unprocessable_entity
+  end
 end
