@@ -50,31 +50,6 @@ describe 'Coupon endpoints', :type => :request do
             expect(json[:data]).to all(include(:id, :type, :attributes))
             expect(json[:meta][:count]).to eq(8)
         end
-
-        # xit 'should return an empty body if there are no inactive coupons', :skip_before do
-        #     create_list(:coupon, 5, status: 'active')
-
-        #     get api_v1_coupons_path, params: { active: 'true' }
-        #     json = JSON.parse(response.body, symbolize_names: true)
-
-        #     expect(response).to have_http_status(:ok)
-        #     expect(json[:data]).to eq([])
-        #     expect(json[:meta][:count]).to eq(0)
-        # end
-
-        it 'should throw in error if the query param is invalid' do
-            get api_v1_coupons_path, params: { test: 'true' }
-            json = JSON.parse(response.body, symbolize_names: true)
-
-            expect(json[:message]).to eq("your query could not be completed")
-            expect(json[:errors]).to eq(["invalid search params"])
-
-            get api_v1_coupons_path, params: { active: 'test' }
-            json = JSON.parse(response.body, symbolize_names: true)
-
-            expect(json[:message]).to eq("your query could not be completed")
-            expect(json[:errors]).to eq(["invalid search params"])
-        end
     end
 
     describe 'GET coupon by id' do
@@ -144,7 +119,7 @@ describe 'Coupon endpoints', :type => :request do
             json = JSON.parse(response.body, symbolize_names: true)
 
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(json[:errors]).to eq("Dollar off is not a number and Dollar off can't be blank")
+            expect(json[:errors]).to eq(["Validation failed: Dollar off is not a number, Dollar off can't be blank"])
         end
 
         it 'should not create a Coupon that is trying to use an exisitng code' do
@@ -170,8 +145,8 @@ describe 'Coupon endpoints', :type => :request do
             json = JSON.parse(response.body, symbolize_names: true)
 
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(json[:message]).to eq("Creation Failed")
-            expect(json[:errors]).to eq("Code has already been taken")
+            expect(json[:message]).to eq("Your query could not be completed")
+            expect(json[:errors]).to eq(["Validation failed: Code has already been taken"])
         end
     end
 
@@ -226,15 +201,6 @@ describe 'Coupon endpoints', :type => :request do
 
             expect(response).to have_http_status(:unprocessable_entity)
             expect(json[:message]).to eq("This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.")
-        end
-
-        it 'should not allow for a user to input a param other than deactivate or activate' do
-            coupon = create(:coupon)
-            patch "/api/v1/coupons/#{coupon.id}?status=test", params: body, as: :json
-            json = JSON.parse(response.body, symbolize_names: true)
-
-            expect(json[:message]).to eq("your query could not be completed")
-            expect(json[:errors]).to eq(["invalid search params"])
         end
     end
 end

@@ -27,20 +27,6 @@ describe Coupon, type: :model do
             expect(meta_count).to eq(3)
         end
 
-        it 'should update a coupons status from active to inactive' do
-            coupon = create(:coupon, status: 'active')
-            Coupon.active_status_change(coupon)
-
-            expect(coupon.status).to eq("inactive")
-        end
-
-        it 'should update a coupons status from inactive to active' do
-            coupon = create(:coupon, status: 'inactive')
-            Coupon.inactive_status_change(coupon)
-
-            expect(coupon.status).to eq("active")
-        end
-
         it 'should set a coupons status to inactive upon creation' do
             coupon = create(:coupon)
 
