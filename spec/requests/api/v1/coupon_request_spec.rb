@@ -146,6 +146,33 @@ describe 'Coupon endpoints', :type => :request do
             expect(response).to have_http_status(:unprocessable_entity)
             expect(json[:errors]).to eq("Dollar off is not a number and Dollar off can't be blank")
         end
+
+        it 'should not create a Coupon that is trying to use an exisitng code' do
+            coupon = create(:coupon, code: "testcode1234")
+
+            name = Faker::Commerce.product_name + " Discount"
+            code = "testcode1234"
+            percent_off = 0
+            dollar_off = 10
+            merchant_id = @merchants[2].id
+            status = "active"
+
+            body = {
+                name: name,
+                code: code,
+                percent_off: percent_off,
+                dollar_off: dollar_off,
+                merchant_id: merchant_id,
+                status: status
+            }
+
+            post api_v1_coupons_path, params: body, as: :json
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(json[:message]).to eq("Creation Failed")
+            expect(json[:errors]).to eq("Code has already been taken")
+        end
     end
 
     describe 'PATCH coupon/:id' do

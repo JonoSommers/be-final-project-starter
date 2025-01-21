@@ -30,6 +30,13 @@ describe 'Merchant Coupons endpoint', :type => :request do
             expect(coupon_1_data[:status]).to eq(@coupon_1.status)
         end
 
-        it 'should rai'
+        it 'should throw an error if the ID is invalid' do
+            get api_v1_merchant_coupons_path(merchant_id: 99999)
+            json = JSON.parse(response.body, symbolize_names: true)
+
+            expect(response).to have_http_status(:not_found)
+            expect(json[:message]).to eq("Your query could not be completed")
+            expect(json[:errors]).to eq(["Couldn't find Merchant with 'id'=99999"])
+        end
     end
 end
