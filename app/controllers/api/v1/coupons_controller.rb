@@ -8,8 +8,6 @@ class Api::V1::CouponsController < ApplicationController
         elsif params[:inactive] == 'true'
             options[:meta] = {count: Coupon.inactive_coupons.count}
             render json: CouponSerializer.new(Coupon.inactive_coupons, options), status: :ok
-        else
-            render_error
         end
     end
 
@@ -22,28 +20,23 @@ class Api::V1::CouponsController < ApplicationController
 
     def create
         coupon = Coupon.new(coupon_params)
-        if coupon.valid?
-            coupon.save
+        if coupon.save!
             render json: CouponSerializer.new(coupon), status: :created
-        else
-            creation_error(coupon)
         end
     end
 
     def update
         coupon = Coupon.find(params[:id])
         if params[:status] == "deactivate"
-            Coupon.active_status_change(coupon)
+            coupon.update(status: "inactive")
             render json: CouponSerializer.new(coupon), status: :ok
         elsif params[:status] == "activate"
             if Coupon.has_met_coupon_limit(coupon)
                 render json: { message: 'This Merchant already has 5 active coupons. Please deactivate one of this Merchant coupons before continuing.' }, status: :unprocessable_entity
             else
-                Coupon.inactive_status_change(coupon)
+                coupon.update(status: "active")
                 render json: CouponSerializer.new(coupon), status: :ok
             end
-        else
-            render_error
         end
     end
 
